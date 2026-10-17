@@ -1,0 +1,5 @@
+# Insert the DSH Opening Host half into the active profile.
+# The browser half is assembled from package.json's `dsh.client` section.
+- insert:
+    - id: dsh-opening
+      name: '@local/dsh-opening'
