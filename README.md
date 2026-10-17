@@ -11,10 +11,10 @@
 
 ## 特性
 
-- **成片原样播放**：1920×1080 / 30 fps / H.264 + AAC 立体声，19.5 秒；不在浏览器里重绘，也不引入任何第三方素材。
+- **成片原样播放**：1920×1080 / 30 fps / H.264 + AAC 立体声，19.5 秒；不在浏览器里重绘，也不引用任何外部图片或音频素材。
 - **启动自动播放**：每个页面会话一次；新开标签页或重启客户端会再次播放。
 - **可跳过**：右上角「跳过 / Skip」，`Esc` 同样有效。
-- **声音兜底**：浏览器拒绝带声音自动播放时先静音播放，首次点击/按键即开声。
+- **声音兜底**：浏览器拒绝带声音自动播放时先静音播放，首次点击即开声。
 - **可重播**：设置 → 通用 → 开场动画 → 重新播放。
 - **尊重 `prefers-reduced-motion`**：停在海报上，点播放才开始。
 - **不会卡住界面**：全屏遮罩自带时长看门狗，媒体异常或 `ended` 丢失时会自动收起。
@@ -37,7 +37,7 @@ plugin_manager({
 })
 ```
 
-安装会写入当前 profile，对同一 profile 的所有会话生效。安装完成后刷新页面即可看到开场；同一页面会话只会自动播放一次。
+安装会写入当前 profile（包名 `@local/dsh-opening`，本地 bundle，不发布到 npm），对同一 profile 的所有会话生效。安装完成后刷新页面即可看到开场；同一页面会话只会自动播放一次，想再看可用设置里的「重新播放」。
 
 > 插件以目录链接（`link:`）方式挂载，请不要在安装后删除或移动克隆目录。
 
@@ -69,7 +69,7 @@ plugin_manager({
 
 | 文件 | 职责 |
 |---|---|
-| [`index.js`](index.js) | Host：注册 `/dsh-opening/state.json` 与 `/dsh-opening/media/*`，支持 `HEAD`、`Range`、`ETag`、`304`、`416` |
+| [`index.js`](index.js) | Host：注册 `/dsh-opening/state.json` 与两条媒体路由（`opening.mp4` / `poster.png`），支持 `HEAD`、`Range`、`ETag`、`304`、`416` |
 | [`client.js`](client.js) | 浏览器：向 `shell.overlay` 注册全屏播放器，向 `settings.general.item` 注册重播行 |
 | [`cordis.patch.yml`](cordis.patch.yml) | 把 Host 行插入 profile |
 | [`locale/`](locale) | 插件管理器的中英文名称与描述 |
@@ -93,6 +93,7 @@ curl -s -D - -o NUL -H "Range: bytes=0-1023" \
 
 预期：状态请求 `200 application/json`；影片 `200` 且带 `Accept-Ranges: bytes`；
 Range 请求 `206` 且 `Content-Range: bytes 0-1023/30645130`；越界 Range 返回 `416`。
+`-o NUL` 是 Windows 写法；macOS / Linux 请改成 `-o /dev/null`。
 
 成片 SHA-256：
 
